@@ -3,6 +3,7 @@
 #include<ctime>
 #include<random>
 #include<cstdlib>
+#include<filesystem>
 #include<windows.h>
 using namespace std;
 
@@ -11,7 +12,7 @@ void wait(unsigned long time) {
     while((float)(clock() - s) / ((float)CLOCKS_PER_SEC / 1000) < (float)time);
 }
 
-void out_slow(ostream& out, string s, unsigned long delay) {
+void out_slow(ostream& out, string s, volatile unsigned long delay) {
     for (size_t i = 0; i < s.length(); ++i) {
         out << s[i];
         wait(delay);
@@ -27,6 +28,7 @@ void new_process(LPTSTR exepath) {
 }
 
 int main(int argc, char** argv) {
+    const string pass = "12345678";
     string s;
     random_device rd;
     minstd_rand mr(rd());
@@ -35,12 +37,13 @@ int main(int argc, char** argv) {
     cin >> s;
     out_slow(cout, "Cheking Passward...\n", 120);
     wait((unsigned long)dist(mr));
-    if (s == "12345678") {
-        out_slow(cout, "Passward is Accepted.\n\n", 80);
+    if (s == pass) {
+        out_slow(cout, "Passward Accepted.\n\n", 80);
         wait(200);
         out_slow(cout, "Building Main Game.....\n\n", 80);
         wait(2000);
-        LPTSTR proc = TEXT("calc.exe");
+        filesystem::copy("./game/tmp/tmpfile", "./main.exe");
+        LPTSTR proc = TEXT("./main.exe");
         new_process(proc);
     } else {
         out_slow(cout, "Passward is Incorrect.\n", 40);
